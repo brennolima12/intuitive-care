@@ -11,23 +11,19 @@ def ler_tabelas():
 def organizar_dados(tabelas):
     print('Estruturando dados para o arquivo CSV')
 
-    # Pega o cabeçalho da primeira tabela
     colunas = tabelas[0].columns
     tabelas_limpas = [tabelas[0]]
 
-    # Força as colunas da primeira nas outras, se forem compatíveis
     for i, tabela in enumerate(tabelas[1:], start=2):
         if tabela.shape[1] == len(colunas):
             nova_tabela = tabela.copy()
             nova_tabela.columns = colunas
             tabelas_limpas.append(nova_tabela)
         else:
-            print(f"⚠️ Tabela da página {i} ignorada (colunas incompatíveis: {tabela.shape[1]} vs {len(colunas)})")
+            print(f"Tabela da página {i} ignorada (colunas incompatíveis: {tabela.shape[1]} vs {len(colunas)})")
 
-    # Concatena tudo
     df = pd.concat(tabelas_limpas, ignore_index=True)
 
-    # Limpeza
     df.dropna(how='all', inplace=True)
     df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
 
@@ -37,14 +33,12 @@ def organizar_dados(tabelas):
         else:
             df[col] = df[col].fillna("")
 
-    # Substituições
     substituicoes = {
         "OD": "Seg. Odontológica",
         "AMB": "Seg. Ambulatorial"
     }
     df = df.replace(substituicoes)
 
-    # Salva CSV
     df.to_csv("arquivo.csv", index=False)
     return "arquivo.csv"
 
